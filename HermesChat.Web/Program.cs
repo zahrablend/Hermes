@@ -36,7 +36,6 @@ namespace HermesChat.Web
 
             builder.Services.AddIdentity<User, IdentityRole>(opt =>
             {
-                // Override the default password configuration - ???
                 opt.Password.RequiredLength = 8;
                 opt.Password.RequireDigit = false;
                 opt.Password.RequireUppercase = false;
@@ -55,11 +54,10 @@ namespace HermesChat.Web
             builder.Services.Configure<EmailConfirmationTokenProviderOptions>(opt =>
                 opt.TokenLifespan = TimeSpan.FromDays(3));
 
-            // Add services to the container.
+            // Add services to the container
             builder.Services.AddAutoMapper(typeof(Program));
 
             // register email configuration
-
             var emailConfig = new EmailConfiguration
             {
                 From = config.GetSection("From").Value,
@@ -121,7 +119,6 @@ namespace HermesChat.Web
                 name: "default",
                 pattern: "{controller=Home}/{action=Chat}/{id?}");
 
-            //app.MapRazorPages();
             app.Run();
         }
     }

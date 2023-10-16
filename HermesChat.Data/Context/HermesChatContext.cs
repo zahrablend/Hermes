@@ -1,10 +1,8 @@
 ﻿using HermesChat.Data.Models;
 using HermesChat.Data.Models.Configuration;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System.Reflection.Emit;
 
 namespace HermesChat.Data.Context;
 

@@ -10,7 +10,6 @@ namespace EmailService
 
         public Message(IEnumerable<string> to, string subject, string content)
         {
-            // Need modification !!!
             To = new List<MailboxAddress>();
 
             To.AddRange(to.Select(x =>
