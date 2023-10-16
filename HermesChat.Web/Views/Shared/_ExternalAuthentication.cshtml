@@ -1,0 +1,36 @@
+﻿@using HermesChat.Data.Models;
+@using Microsoft.AspNetCore.Identity
+
+@inject SignInManager<User> SignInManager
+
+<div class="col-md-4 offset-2">
+    <section>
+        <h4>Use different service for log in:</h4>
+            <p>Notification: You can try Google sign in. Facebook working only in production mode due to restrictions.</p>
+        <hr />
+        @{
+            var providers = (await SignInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+            if (!providers.Any())
+            {
+                <div>
+                    <p>
+                        We couldn't find any external provider
+                    </p>
+                </div>
+            }
+            else
+            {
+                <form asp-action="ExternalLogin" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal">
+                    <div>
+                        <p>
+                            @foreach (var provider in providers)
+                            {
+                                <input type="submit" class="btn btn-info" value="@provider.Name" name="provider" />
+                            }
+                        </p>
+                    </div>
+                </form>
+            }
+        }
+    </section>
+</div>

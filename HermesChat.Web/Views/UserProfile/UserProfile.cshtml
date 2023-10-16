@@ -1,0 +1,26 @@
+﻿@model HermesChat.Web.Models.UserProfile
+@{
+    ViewData["Title"] = "Profile";
+}
+
+<h1>Profile</h1>
+
+<form asp-action="UpdateProfile" asp-controller="UserProfile" method="post" enctype="multipart/form-data">
+    <div class="form-group">
+        <label for="Avatar">Avatar</label>
+        @if (Model.Avatar != null)
+        {
+                <img src="data:image/png;base64,@Convert.ToBase64String(Model.Avatar)" width="200" />
+        }
+        <input type="file" id="Avatar" name="Avatar" class="form-control">
+    </div>
+    <div class="form-group">
+        <label for="Name">Username</label>
+        <input type="text" id="Name" name="Name" value="@Model.Name" class="form-control" readonly>
+    </div>
+    <div class="form-group">
+        <label for="Email">Email</label>
+        <input type="email" id="Email" name="Email" value="@Model.Email" class="form-control" readonly>
+    </div>
+    <button type="submit" class="btn btn-primary">Update Avatar</button>
+</form>

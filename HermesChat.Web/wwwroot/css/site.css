@@ -1,0 +1,105 @@
+html {
+    font-size: 14px;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    margin-bottom: 60px;
+}
+
+.btn--join {
+    align-self: flex-end;
+    border-style: solid;
+    border-color: black;
+}
+
+.hidden {
+    display: none;
+}
+
+.list-item--join {
+    display: flex;
+}
+
+.list-item--space {
+    flex-grow: 4;
+}
+
+.btn-light-hermes {
+    border-style: solid;
+    border-color: black;
+    padding: 10px;
+}
+
+.item--flex {
+    flex-grow: 1;
+}
+
+.add-group-hermes {
+    display: flex;
+    align-items: baseline;
+    margin: 20px 20px 0px 5px;
+}
+
+.text-wrapping-hermes {
+    overflow-wrap: break-word;
+}
+
+.flexbox-container-hermes {
+    display: flex;
+    align-items: flex-start;
+    align-content: stretch;
+}
+
+.message-input-hermes {
+    height: 80px;
+    padding: 10px;
+    box-sizing: border-box;
+    vertical-align: top;
+}
+
+.label-hermes {
+    padding: 10px;
+}
+
+.h3-padding-hermes {
+    margin-bottom: 15px;
+}
+
+.display-flex-hermes {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.btn-align-left-hermes {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.container-margins-hermes > * {
+    margin: 0px 20px 0px 5px;
+}
+
+.group-input-custom-margin {
+    margin: 0px 10px 0px 10px;
+}
+
+.tooltip-hermes {
+    position: relative;
+}
+
+.tooltip-left-hermes {
+    position: absolute;
+    right: 0;
+}

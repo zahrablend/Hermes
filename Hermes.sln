@@ -1,0 +1,48 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33205.214
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "crs", "crs", "{3C01AFCF-75A9-4892-B4B1-B91E66D488F7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataAccess", "DataAccess", "{B549C7B8-3628-413C-A1CB-8F9ADEF5D454}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HermesChat.Data", "HermesChat.Data\HermesChat.Data.csproj", "{323D5183-592B-4E73-BDCD-92D163F8DE19}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HermesChat.Web", "HermesChat.Web\HermesChat.Web.csproj", "{236CC567-F6A4-4B06-A503-A123CADEB768}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EmailService", "EmailService", "{CF2F3F2E-550D-41A7-889D-4732DD3654E2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmailService", "EmailService\EmailService.csproj", "{B494BAB3-AB47-4418-8608-211AC65FCA0C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{323D5183-592B-4E73-BDCD-92D163F8DE19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{323D5183-592B-4E73-BDCD-92D163F8DE19}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{323D5183-592B-4E73-BDCD-92D163F8DE19}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{323D5183-592B-4E73-BDCD-92D163F8DE19}.Release|Any CPU.Build.0 = Release|Any CPU
+		{236CC567-F6A4-4B06-A503-A123CADEB768}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{236CC567-F6A4-4B06-A503-A123CADEB768}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{236CC567-F6A4-4B06-A503-A123CADEB768}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{236CC567-F6A4-4B06-A503-A123CADEB768}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B494BAB3-AB47-4418-8608-211AC65FCA0C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B494BAB3-AB47-4418-8608-211AC65FCA0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B494BAB3-AB47-4418-8608-211AC65FCA0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B494BAB3-AB47-4418-8608-211AC65FCA0C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{323D5183-592B-4E73-BDCD-92D163F8DE19} = {B549C7B8-3628-413C-A1CB-8F9ADEF5D454}
+		{236CC567-F6A4-4B06-A503-A123CADEB768} = {3C01AFCF-75A9-4892-B4B1-B91E66D488F7}
+		{B494BAB3-AB47-4418-8608-211AC65FCA0C} = {CF2F3F2E-550D-41A7-889D-4732DD3654E2}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E530FDDC-FC2D-4535-890F-8BED2C5CD79C}
+	EndGlobalSection
+EndGlobal

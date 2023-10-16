@@ -1,0 +1,642 @@
+﻿@{
+    ViewData["Title"] = "Chat";
+}
+
+
+<div class="text-center">
+    <h1 class="display-4">Welcome to Hermes chat!</h1>
+</div>
+
+<hr />
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <!-- Active users list -->
+            <div class="border p-3">
+                <h3>Active users: </h3>
+                <div class="list-group" id="userList"></div>
+            </div>
+            <!-- Active groups list -->
+            <div class="border p-3">
+                <h3>Active groups: </h3>
+                <div class="list-group" id="groupList"></div>
+            </div>
+            <!-- Add new group -->
+            <div id="startGroupContainer" class="border p-3">
+                <h3>Start new group: </h3>
+
+                <div class="add-group-hermes">
+                    <label>Group name:</label>
+                    <div class="item--flex group-input-custom-margin">
+                        <input type="text" class="form-label form-control" id="groupname" maxlength="30" required />
+                        <div class="invalid-feedback">
+                            Please provide a group name.
+                        </div>
+                    </div>
+                    <input type="button" class="btn btn-light btn-light-hermes" id="enterButton" value="Start group" />
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <!-- Invitations box -->
+            <div id="invitationsContent" class="border p-3 hidden">
+                <h3>Invitations to private chats: </h3>
+                <div>
+                    <div class="list-group" id="senderList"></div>
+                </div>
+            </div>
+            <div class="border p-3">
+                <div id="msg"><p>Please select a chat option to start conversation.</p></div>
+                <!-- Private chat box -->
+                <div id="privateChatContent" class="text-wrapping-hermes container-margins-hermes  hidden">
+                    <div class="display-flex-hermes">
+                        <h3 h3-padding-hermes>Private chat with <span id="recipientName"></span>: </h3>
+                        <input type="button" id="exitPrivateButton" class="btn btn-light btn-light-hermes" value="Leave chat" />
+                    </div>
+
+                    <div class="mt-3">
+                        <ul id="discussionPrivate"></ul>
+                    </div>
+
+                    <div class="mt-5">
+                        <div class="flexbox-container-hermes">
+                            <span class="label-hermes" id="displayUsernamePrivate"></span>
+                            <textarea type="text" class="form-label form-control message-input-hermes" id="messagePrivate" maxlength="100"></textarea>
+                        </div>
+
+                        <div class="btn-align-left-hermes">
+                            <div class="tooltip-hermes" id="emojiContainerPrivate">
+                                <input type="button" id="emojiPickerPrivate" value="🙂" />
+                                <div>
+                                    <emoji-picker id="emojiTablePrivate" class="tooltip-left-hermes hidden"></emoji-picker>
+                                </div>
+                            </div>
+                            <input type="button" id="sendmessagePrivate" class="btn btn-light btn-light-hermes" value="Send message" />
+                        </div>
+                    </div>
+                </div>
+                <!-- Group chat box -->
+                <div id="groupChatContent" class="text-wrapping-hermes container-margins-hermes hidden">
+                    <div class="display-flex-hermes">
+                        <h3 h3-padding-hermes>Messages in group "<span id="displayGroupName"></span>": </h3>
+                        <input type="button" id="exitButton" class="btn btn-light btn-light-hermes" value="Leave group" />
+                    </div>
+
+                    <div class="mt-3">
+                        <ul id="discussionGroup"></ul>
+                    </div>
+
+                    <div class="mt-5">
+                        <div class="flexbox-container-hermes">
+                            <span class="label-hermes" id="displayUsernameGroup"></span>
+                            <textarea type="text" class="form-label form-control message-input-hermes" id="messageGroup" maxlength="100"></textarea>
+                        </div>
+
+                        <div class="btn-align-left-hermes">
+                            <div class="tooltip-hermes" id="emojiContainerGroup">
+                                <input type="button" id="emojiPickerGroup" value="🙂" />
+                                <div>
+                                    <emoji-picker id="emojiTableGroup" class="tooltip-left-hermes hidden"></emoji-picker>
+                                </div>
+                            </div>
+                            <input type="button" id="sendmessageGroup" class="btn btn-light btn-light-hermes" value="Send message" />
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@@^1/index.js" crossorigin="anonymous"></script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src=" https://cdn.jsdelivr.net/npm/@@microsoft/signalr@7.0.10/dist/browser/signalr.min.js "></script>
+
+
+<script>
+
+
+
+    //creating connection
+    var connection = new signalR.HubConnectionBuilder().withUrl("/chat").build();
+
+    //starting connection
+    connection.start().catch((err) => {
+        return console.error(err.toString());
+    });
+
+
+    let currentGroupName = null;
+    let currentRecipient = null;
+
+    //---------------------------------------------------
+    //Functions
+    //---------------------------------------------------
+
+    const updateUserList = (users) => {
+        console.log("updateUserList called");
+        const userList = document.getElementById("userList");
+        userList.innerHTML = "";
+        users.forEach((user) => {
+            const userlistItem = document.createElement("div");
+            const labelItem = document.createElement("div");
+            labelItem.textContent = user;
+            const labelSpaceItem = document.createElement("div"); // to display space between label and button
+            labelSpaceItem.classList.add("list-item--space");
+            userlistItem.classList.add("list-group-item", "list-group-item-action", "align-items-center", "list-item--join");
+            userlistItem.appendChild(labelItem);
+            userlistItem.appendChild(labelSpaceItem);
+            userList.appendChild(userlistItem);
+            const currentUser = localStorage.getItem("currentUser"); //save current user so the button Start Chat will not be shown to it
+            console.log("current user", currentUser);
+            if (!(user === currentUser || user === currentRecipient)) { //hidding Join group button if you are already in it or you already started chat
+                const buttonJoinItem = document.createElement("button");
+                buttonJoinItem.classList.add("btn", "btn-light", "btn-light-hermes", "btn--join");
+                buttonJoinItem.textContent = "Start chat";
+                buttonJoinItem.addEventListener("click", async (event) => {
+                    try {
+                        removeMessagesGroup();
+                        removeMessagesPrivate()
+                        currentRecipient = user; //currentRecipient = user to initiate private chat with
+                        userlistItem.removeChild(buttonJoinItem);
+                        toggleChatContent("private");//show chat page
+                        await connection.invoke("RemoveFromAllGroups");
+                        await connection.invoke("RemoveSendInvitation");
+                        const inputMessage = document.getElementById("messagePrivate"); //disabling message input field
+                        const sendMessage = document.getElementById("sendmessagePrivate");
+                        const iconButton = document.getElementById("emojiPickerPrivate");
+                        inputMessage.disabled = true;
+                        sendMessage.disabled = true;
+                        iconButton.disabled = true;
+                        await connection.invoke("InviteToPrivate", currentRecipient);
+                        addMessagePrivate(`Please wait until ${user} accepts or declines your invitation.`);
+                    } catch (err) {
+                        console.error(err.toString());
+                    }
+                });
+                userlistItem.appendChild(buttonJoinItem);
+            }
+        });
+    }
+
+    const updateGroupList = (groups) => {
+        //update group list
+        const groupList = document.getElementById("groupList");
+        groupList.innerHTML = "";
+        groups.forEach((group) => {
+            const grouplistItem = document.createElement("div");
+            const labelItem = document.createElement("div");
+            labelItem.textContent = group;
+            const labelSpaceItem = document.createElement("div"); // to display space between label and button
+            labelSpaceItem.classList.add("list-item--space");
+            grouplistItem.classList.add("list-group-item", "list-group-item-action", "align-items-center", "list-item--join");
+            grouplistItem.appendChild(labelItem);
+            grouplistItem.appendChild(labelSpaceItem);
+            groupList.appendChild(grouplistItem);
+            if (group !== currentGroupName) { //hidding Join group button if you are already in it
+                const buttonJoinItem = document.createElement("button");
+                buttonJoinItem.classList.add("btn", "btn-light", "btn-light-hermes", "btn--join");
+                buttonJoinItem.textContent = "Join chat";
+                //    join existing group from group list (automatically set group name)
+                buttonJoinItem.addEventListener("click", async (event) => {
+                    try {
+                        removeMessagesGroup();
+                        removeMessagesPrivate();
+                        toggleChatContent("group"); //show chat page
+                        currentGroupName = group;
+                        await connection.invoke("AddToGroup", group);
+                    } catch (err) {
+                        console.error(err.toString());
+                    }
+                });
+                grouplistItem.appendChild(buttonJoinItem);
+            }
+        });
+    }
+
+    const addMessageGroup = (message) => {
+        console.log("addMessageGROUP", message);
+        try {
+            const li = document.createElement("li");
+            li.textContent = message;
+            document.getElementById('discussionGroup').appendChild(li);
+        } catch (err) {
+            console.error(err.toString());
+        }
+    }
+
+    const addMessagePrivate = (message) => {
+        console.log("addMessagePRIVATE", message);
+        const li = document.createElement("li");
+        li.textContent = message;
+        document.getElementById("discussionPrivate").appendChild(li);
+    }
+
+    const removeMessagesGroup = () => {
+        console.log("removeMessagesGroup");
+        const element = document.getElementById("discussionGroup");
+        element.innerHTML = '';
+    }
+
+    const removeMessagesPrivate = () => {
+        console.log("removeMessagesPrivate");
+        const element = document.getElementById("discussionPrivate");
+        element.innerHTML = '';
+    }
+
+    const getString = (id) => {
+        return document.getElementById(id).value;
+    }
+
+    const setString = (id, value) => {
+        document.getElementById(id).innerText = value;
+    }
+
+    const getUserPrivate = () => {
+        return getString("displayUsernamePrivate");
+    }
+    const getUserGroup = () => {
+        return getString("displayUsernameGroup");
+    }
+
+    const getMessageGroup = () => {
+        return getString("messageGroup");
+    }
+    const getMessagePrivate = () => {
+        return getString("messagePrivate");
+    }
+
+    const getGroup = () => {
+        return getString("groupname");
+    }
+
+    const setUserNameGroup = (userName) => {
+        localStorage.setItem("currentUser", userName); //(key,value)
+        return setString("displayUsernameGroup", userName);
+    }
+
+    const setUserNamePrivate = (userName) => {
+        localStorage.setItem("currentUser", userName); //(key,value)
+        return setString("displayUsernamePrivate", userName);
+    }
+
+    const setGroupName = (groupName) => {
+        return setString("displayGroupName", groupName);
+    }
+
+    const setPrivateName = (user) => {
+        return setString("recipientName", user);
+    }
+
+    const toggleChatContent = (content) => { //to show or hide chat page
+        const chatContentGroup = document.getElementById("groupChatContent");
+        const chatContentPrivate = document.getElementById("privateChatContent");
+        const msgEl = document.getElementById("msg");
+        if (content === "group") {
+            chatContentGroup.classList.remove("hidden");
+            chatContentPrivate.classList.add("hidden");
+            msgEl.classList.add("hidden");
+        } else if (content === "private") {
+            chatContentPrivate.classList.remove("hidden");
+            chatContentGroup.classList.add("hidden");
+            msgEl.classList.add("hidden");
+        }
+        else {
+            msgEl.classList.remove("hidden");
+            chatContentPrivate.classList.add("hidden");
+            chatContentGroup.classList.add("hidden");
+        }
+    }
+
+    const toggleInvitationsContent = (show) => { //to show or hide invitations page
+        console.log("toggleInvitationsContent called, parameter", show)
+        const invitationsContent = document.getElementById("invitationsContent");
+        if (show) {
+            invitationsContent.classList.remove("hidden");
+        } else {
+            invitationsContent.classList.add("hidden");
+        }
+    }
+
+    //exit private chat
+    document.getElementById("exitPrivateButton").addEventListener("click", async (event) => {
+        const tempRecipient = currentRecipient;
+        currentRecipient = null;
+        await connection.invoke("SendMessagePrivate", tempRecipient, `left chat.`);
+        console.log("user who left", tempRecipient);
+        toggleChatContent("msg");
+        await connection.invoke("RequestUserListUpdate", tempRecipient);
+    });
+
+    //emoji map for conversion
+    const emojiMap = {
+        "<3": "\u2764\uFE0F",
+        ":/": "\ud83e\udee4",
+        ":D": "\ud83d\ude03",
+        ":)": "\ud83d\ude42",
+        ";)": "\uD83D\uDE09",
+        ":(": "\uD83D\uDE12",
+        ":p": "\uD83D\uDE1B",
+        ";p": "\uD83D\uDE1C",
+        ":'(": "\uD83D\uDE22"
+    };
+
+
+    //group chat emojis
+    const messageGroupElement = document.getElementById("messageGroup");
+    messageGroupElement.oninput = () => {
+        console.log("emoji converter working");
+        for (const key of Object.keys(emojiMap)) {
+            const emo = emojiMap[key];
+            messageGroupElement.value = messageGroupElement.value.replace(key, emo);
+        }
+    };
+
+    document.getElementById("emojiPickerGroup").addEventListener("click", event => {
+        const emojiTable = document.getElementById("emojiTableGroup");
+        if (emojiTable.classList.contains("hidden")) {
+            emojiTable.classList.remove("hidden");
+        }
+        else {
+            emojiTable.classList.add("hidden");
+        }
+    });
+
+    document.getElementById("emojiTableGroup").addEventListener("emoji-click", event => {
+        console.log(event.detail);
+        const msgEl = document.getElementById("messageGroup");
+        msgEl.value += event.detail.unicode;
+    });
+
+    //hide group chat emoji when clicked anywhere outside emoji table
+    document.addEventListener("click", (event) => {
+        const emojiContainerGroup = document.getElementById("emojiContainerGroup");
+        const input = document.getElementById("emojiTableGroup");
+        const target = event.target;
+        if (!emojiContainerGroup.contains(target)) {
+            // Clicked outside the div
+            input.classList.add("hidden");
+        }
+    });
+
+    //private chat emojis
+
+    const messagePrivateElement = document.getElementById("messagePrivate");
+    messagePrivateElement.oninput = () => {
+        console.log("emoji converter working");
+        for (const key of Object.keys(emojiMap)) {
+            const emo = emojiMap[key];
+            messagePrivateElement.value = messagePrivateElement.value.replace(key, emo);
+        }
+    };
+    document.getElementById("emojiPickerPrivate").addEventListener("click", event => {
+        const emojiTable = document.getElementById("emojiTablePrivate");
+        if (emojiTable.classList.contains("hidden")) {
+            emojiTable.classList.remove("hidden");
+        }
+        else {
+            emojiTable.classList.add("hidden");
+        }
+    });
+
+    document.getElementById("emojiTablePrivate").addEventListener("emoji-click", event => {
+        const msgEl = document.getElementById("messagePrivate");
+        msgEl.value += event.detail.unicode;
+    });
+
+    //hide private chat emoji when clicked anywhere outside emoji table
+    document.addEventListener("click", (event) => {
+        const emojiContainerPrivate = document.getElementById("emojiContainerPrivate");
+        const input = document.getElementById("emojiTablePrivate");
+        const target = event.target;
+        if (!emojiContainerPrivate.contains(target)) {
+            // Clicked outside the div
+            input.classList.add("hidden");
+        }
+    });
+
+    //---------------------------------------------------
+    //Messages to hub
+    //---------------------------------------------------
+
+
+
+    const sendMessageGroup = async () => {
+        const inputBox = document.getElementById("messageGroup");
+        if (inputBox.value !== "") {
+            await connection.invoke("SendMessageGroup", currentGroupName, getMessageGroup());
+            inputBox.value = ''; //clear input value after sending
+        }
+    }
+
+    //on Send button
+    document.getElementById("sendmessageGroup").addEventListener("click", async (event) => {
+        try {
+            sendMessageGroup();
+        } catch (err) {
+            console.error(err.toString());
+        }
+    });
+
+    //on Enter button
+    document.getElementById("messageGroup").addEventListener("keydown", async (event) => {
+        try {
+            if (event.keyCode === 13) {
+                sendMessageGroup();
+            }
+        } catch (err) {
+            console.error(err.toString());
+        }
+    });
+
+
+    const sendMessagePrivate = async () => {
+        const inputBox = document.getElementById("messagePrivate");
+        if (inputBox.value !== "") {
+            await connection.invoke("SendMessagePrivate", currentRecipient, getMessagePrivate());
+            inputBox.value = ''; //clear input value after sending
+        }
+    }
+
+    //on Send button
+    document.getElementById("sendmessagePrivate").addEventListener("click", async (event) => {
+        try {
+            sendMessagePrivate();
+        } catch (err) {
+            console.error(err.toString());
+        }
+    });
+
+    //on Enter button
+    document.getElementById("messagePrivate").addEventListener("keydown", async (event) => {
+        try {
+            if (event.keyCode === 13) {
+                sendMessagePrivate();
+            }
+        } catch (err) {
+            console.error(err.toString());
+        }
+    });
+
+    //create new group or join existing group with manually entering group name
+    document.getElementById("enterButton").addEventListener("click", async (event) => {
+        try {
+            const groupName = getGroup();
+            const input = document.getElementById("groupname");
+            const pattern = /\s{2,}/;
+            if (groupName === "" || groupName === " " || pattern.test(groupName)) {
+                input.classList.add("is-invalid");
+            }
+            else {
+                input.classList.remove("is-invalid");
+                removeMessagesGroup();
+                toggleChatContent("group"); //show chat page
+                currentGroupName = groupName;
+                currentRecipient = null; //when exiting private chat, to start showing Start chat with current recipient again
+                console.log("enter", groupName)
+                input.value = '';
+                await connection.invoke("AddToGroup", groupName);
+            }
+        } catch (err) {
+            console.error(err.toString());
+        }
+    });
+
+    //hide error message when outside of Start new group container is clicked
+    document.addEventListener("click", (event) => {
+        const startGroupContainer = document.getElementById("startGroupContainer");
+        const input = document.getElementById("groupname");
+        const target = event.target;
+        if (!startGroupContainer.contains(target)) {
+            // Clicked outside the div
+            input.classList.remove("is-invalid");
+        }
+    });
+
+
+    //exit group chat
+    document.getElementById("exitButton").addEventListener("click", async (event) => {
+        try {
+            currentGroupName = null;
+            removeMessagesGroup();
+            removeMessagesPrivate();
+            await connection.invoke("RemoveFromAllGroups");
+            await connection.invoke("RequestGroupListUpdate");
+            toggleChatContent("msg"); //hide chat page
+        } catch (err) {
+            console.error(err.toString());
+        }
+    });
+
+
+    //---------------------------------------------------
+    //Messages from hub
+    //---------------------------------------------------
+
+
+    connection.on("enteredOrLeft", (message) => {
+        addMessageGroup(message);
+        addMessagePrivate(message);
+    });
+
+    connection.on("receiveMessageGroup", (user, message) => {
+        addMessageGroup(user + ": " + message);
+    });
+
+    connection.on("receiveMessagePrivate", (user, message) => {
+        addMessagePrivate(user + ": " + message);
+    });
+
+    connection.on("updateUserList", updateUserList);
+
+    connection.on("updateGroupList", updateGroupList);
+
+    connection.on("setUserNameGroup", setUserNameGroup);
+
+    connection.on("setUserNamePrivate", setUserNamePrivate);
+
+    connection.on("setGroupName", setGroupName);
+
+    connection.on("updateInvitations", (senders) => {
+        try {
+            toggleInvitationsContent(senders.length > 0); //show invitations content (for a recipient) only if there are invitations
+            const senderList = document.getElementById("senderList");
+            senderList.innerHTML = "";
+            senders.forEach((sender) => {
+                const senderlistItem = document.createElement("div");
+                const labelItem = document.createElement("div");
+                const acceptButtonJoinItem = document.createElement("button");
+                const declineButtonJoinItem = document.createElement("button");
+                const labelSpaceItem = document.createElement("div"); // space between label and buttons
+                labelItem.textContent = sender;
+                labelSpaceItem.classList.add("list-item--space");
+                acceptButtonJoinItem.classList.add("btn", "btn-light", "btn-light-hermes", "btn--join");
+                acceptButtonJoinItem.textContent = "Accept";
+                declineButtonJoinItem.classList.add("btn", "btn-light", "btn-light-hermes", "btn--join");
+                declineButtonJoinItem.textContent = "Decline";
+                senderlistItem.classList.add("list-group-item", "list-group-item-action", "align-items-center", "list-item--join");
+                senderlistItem.appendChild(labelItem);
+                senderlistItem.appendChild(labelSpaceItem);
+                senderlistItem.appendChild(acceptButtonJoinItem);
+                senderlistItem.appendChild(declineButtonJoinItem);
+                senderList.appendChild(senderlistItem);
+
+                acceptButtonJoinItem.addEventListener("click", async (event) => {
+                    try {
+
+                        currentRecipient = sender;
+                        removeMessagesGroup();
+                        removeMessagesPrivate();
+                        await connection.invoke("RemoveFromAllGroups");
+                        await connection.invoke("AcceptToPrivate", currentRecipient);
+                        toggleChatContent("private");
+                        setPrivateName(sender);
+                        const inputMessage = document.getElementById("messagePrivate"); //enabling message input field
+                        const sendMessage = document.getElementById("sendmessagePrivate");
+                        const iconButton = document.getElementById("emojiPickerPrivate");
+                        inputMessage.disabled = false;
+                        sendMessage.disabled = false;
+                        iconButton.disabled = false;
+                        console.log("AcceptToPrivate invoked");
+                    } catch (err) {
+                        console.error(err.toString());
+                    }
+                });
+
+                declineButtonJoinItem.addEventListener("click", async (event) => {
+                    try {
+                        console.log("declineButton click", currentRecipient);
+                        await connection.invoke("DeclinePrivate", sender);
+                        console.log("DeclinePrivate invoked");
+                    } catch (err) {
+                        console.error(err.toString());
+                    }
+                });
+
+            });
+        } catch (err) {
+            console.error(err.toString());
+        }
+    });
+
+    connection.on("userAccepted", (accepter) => {
+        currentRecipient = accepter;
+        addMessagePrivate(`${accepter} has accepted your private chat inivitation.`);
+        setPrivateName(accepter);
+        const inputMessage = document.getElementById("messagePrivate"); //enabling message input field
+        const sendMessage = document.getElementById("sendmessagePrivate");
+        const iconButton = document.getElementById("emojiPickerPrivate");
+        inputMessage.disabled = false;
+        sendMessage.disabled = false;
+        iconButton.disabled = false;
+    });
+
+    connection.on("userDeclined", (accepter) => {
+        addMessagePrivate(`${accepter} has declined your private chat inivitation.`);
+    });
+</script>
