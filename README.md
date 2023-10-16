@@ -2,7 +2,7 @@
 
 ## About this project
 
-Hermes is a chat application project, developed adhering to Scrum methodology and will be used by future company's internal users. Client-server web application is developed using Microsoft technologies and has a remote repository in Azure. 
+Hermes is a chat application project, developed adhering to Scrum methodology and intended for company's internal users. Client-server web application is developed using Microsoft technologies and has a remote repository in Azure. It has been developed as a final project for "Accenture" and "SheGoesTech" Microsoft Technologies and .NET bootcamp by a team of 3 trainees.
 
 ## Technologies used
 
